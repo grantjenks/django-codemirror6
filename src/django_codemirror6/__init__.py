@@ -4,5 +4,5 @@
 __title__ = 'django-codemirror6'
 __copyright__ = '2022, Grant Jenks'
 __author__ = 'Grant Jenks'
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 __license__ = 'Apache 2.0'
