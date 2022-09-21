@@ -28,8 +28,8 @@ jobs:
 
     - name: Upload with twine
       env:
-        TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         ls -l dist/*
         twine upload dist/*
