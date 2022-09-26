@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset=utf8>
+  </head>
+  <body>
+    <h1>CodeMirror!</h1>
+    <div id="editor"></div>
+    <script src="codemirror.min.js"></script>
+    <script src="codemirror-sql.min.js"></script>
+    <script src="y-codemirror.min.js"></script>
+    <script>
+     const doc = `
+-- Some comment about awesomeness.
+
+SELECT foo, bar
+FROM this
+JOIN that
+ON this.abc = that.def
+     `.trim()
+
+     const fixedHeightEditor = EditorView.theme({
+         "&": {height: "300px"},
+         ".cm-scroller": {overflow: "auto"}
+     })
+
+     function myCompletions(context) {
+         let word = context.matchBefore(/\w*/)
+         if (word.from == word.to && !context.explicit)
+             return null
+         return {
+             from: word.from,
+             options: [
+                 {label: "match", type: "keyword"},
+                 {label: "hello", type: "variable", info: "(World)"},
+                 {label: "magic", type: "text", apply: "⠁⭒*.✩.*⭒⠁", detail: "macro"}
+             ]
+         }
+     }
+
+     var ydoc = new Y.Doc()
+     var provider = new WebrtcProvider(
+         '899ab595-1070-470c-9203-f33004fbacfc/first',
+         ydoc,
+         {password: 'sekrit'}
+     )
+     var ytext = ydoc.getText('codemirror')  // 'codemirror' is the widget name
+     const undoManager = new Y.UndoManager(ytext)
+
+     provider.awareness.setLocalStateField('user', {
+         name: 'User ' + Math.floor(Math.random() * 100),
+         color: 'DarkGray',
+         colorLight: 'LightGray'
+     })
+
+     function statusPanel(view) {
+         let dom = document.createElement("div")
+         dom.id = 'status';
+         dom.textContent = 'Syncing ...';
+         return {dom}
+     }
+
+     let state = EditorState.create({
+         doc: ytext.toString(),
+         extensions: [
+             basicSetup,
+             indentationMarkers(),
+             keymap.of([indentWithTab]),
+             StreamLanguage.define(standardSQL),
+             autocompletion({override: [myCompletions]}),
+             EditorView.lineWrapping,
+             fixedHeightEditor,
+             yCollab(ytext, provider.awareness, { undoManager }),
+             showPanel.of(statusPanel)
+         ],
+     })
+
+     var editor = new EditorView({
+         state: state,
+         parent: document.querySelector("#editor")
+     })
+
+     var connected = false;
+
+     function observer(event, transaction) {
+         var el = document.querySelector('#status');
+         el.innerHTML = 'Ready';
+         connected = true;
+         ytext.unobserve(observer);
+     }
+     ytext.observe(observer);
+
+     setTimeout(function () {
+         if (!connected) {
+             ytext.insert(0, doc);
+         }
+     }, 2000);
+    </script>
+  </body>
+</html>
