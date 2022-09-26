@@ -1,6 +1,8 @@
 Django CodeMirror 6
 ===================
 
+THIS PROJECT DOESN'T WORK. IT IS A FAILED EXPERIMENT.
+
 `Django CodeMirror 6 <http://www.grantjenks.com/docs/django-codemirror6/>`__ is
 an Apache2 licensed Django application to support CodeMirror 6.
 
