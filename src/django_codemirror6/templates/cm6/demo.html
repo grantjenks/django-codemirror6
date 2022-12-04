@@ -1,0 +1,96 @@
+{% load static %}
+<!doctype html>
+<html>
+  <body>
+    <h1>Code Mirror 6</h1>
+    <div id="editor"></div>
+    <script src="{% static 'cm6/cm6-sql-yjs.min.js' %}"></script>
+    <script>
+     const doc = `
+-- Some comment about awesomeness.
+
+SELECT foo, bar
+FROM this
+JOIN that
+ON this.abc = that.def
+     `.trim()
+
+     const fixedHeightEditor = CM6.EditorView.theme({
+         "&": {height: "300px"},
+         ".cm-scroller": {overflow: "auto"}
+     })
+
+     function myCompletions(context) {
+         let word = context.matchBefore(/\w*/)
+         if (word.from == word.to && !context.explicit)
+             return null
+         return {
+             from: word.from,
+             options: [
+                 {label: "match", type: "keyword"},
+                 {label: "hello", type: "variable", info: "(World)"},
+                 {label: "magic", type: "text", apply: "⠁⭒*.✩.*⭒⠁", detail: "macro"}
+             ]
+         }
+     }
+
+     var ydoc = new CM6.Y.Doc()
+     var provider = new CM6.WebrtcProvider(
+         '899ab595-1070-470c-9203-f33004fbacfc/first',
+         ydoc,
+         {password: 'sekrit'}
+     )
+     var ytext = ydoc.getText('codemirror')  // 'codemirror' is the widget name
+     const undoManager = new CM6.Y.UndoManager(ytext)
+
+     provider.awareness.setLocalStateField('user', {
+         name: 'User ' + Math.floor(Math.random() * 100),
+         color: 'DarkGray',
+         colorLight: 'LightGray'
+     })
+
+     function statusPanel(view) {
+         let dom = document.createElement("div")
+         dom.id = 'status';
+         dom.textContent = 'Syncing ...';
+         return {dom}
+     }
+
+     let state = CM6.EditorState.create({
+         doc: ytext.toString(),
+         extensions: [
+             CM6.basicSetup,
+             CM6.indentationMarkers(),
+             CM6.keymap.of([CM6.indentWithTab]),
+             CM6.sql(),
+             CM6.autocompletion({override: [myCompletions]}),
+             CM6.EditorView.lineWrapping,
+             fixedHeightEditor,
+             CM6.yCollab(ytext, provider.awareness, { undoManager }),
+             CM6.showPanel.of(statusPanel)
+         ],
+     })
+
+     var editor = new CM6.EditorView({
+         state: state,
+         parent: document.querySelector("#editor")
+     })
+
+     var connected = false;
+
+     function observer(event, transaction) {
+         var el = document.querySelector('#status');
+         el.innerHTML = 'Ready';
+         connected = true;
+         ytext.unobserve(observer);
+     }
+     ytext.observe(observer);
+
+     setTimeout(function () {
+         if (!connected) {
+             ytext.insert(0, doc);
+         }
+     }, 2000);
+    </script>
+  </body>
+</html>
