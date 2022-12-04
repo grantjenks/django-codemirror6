@@ -75,10 +75,8 @@ variants = {
 
 
 def clean():
-    shell('rm -f *.min.js')
-    shell('rm -f package-lock.json')
-    shell('rm -rf node_modules')
-    shell('rm -rf dist')
+    shell('rm -f package-lock.json *.js')
+    shell('rm -rf node_modules dist')
 
 
 def setup():
