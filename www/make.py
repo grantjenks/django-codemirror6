@@ -14,7 +14,7 @@ import sys
 import tqdm
 
 shell = functools.partial(subprocess.run, shell=True)
-Import = collections.namedtuple('Import', 'name path star')
+Import = collections.namedtuple('Import', 'name path star splat')
 
 template = """{import_text}
 
@@ -24,51 +24,52 @@ window.CM6 = {{
 """
 
 base = [
-    Import('CodeMirror', 'codemirror', True),
-    Import('CodeMirrorAutocomplete', '@codemirror/autocomplete', True),
-    Import('CodeMirrorCommands', '@codemirror/commands', True),
+    Import('CodeMirror', 'codemirror', True, True),
+    Import('CodeMirrorAutocomplete', '@codemirror/autocomplete', True, True),
+    Import('CodeMirrorCommands', '@codemirror/commands', True, True),
     Import(
         'CodeMirrorIndentationMarkers',
         '@replit/codemirror-indentation-markers',
         True,
+        True,
     ),
-    Import('CodeMirrorLanguage', '@codemirror/language', True),
-    Import('CodeMirrorLint', '@codemirror/lint', True),
-    Import('CodeMirrorSearch', '@codemirror/search', True),
-    Import('CodeMirrorState', '@codemirror/state', True),
-    Import('CodeMirrorView', '@codemirror/view', True),
+    Import('CodeMirrorLanguage', '@codemirror/language', True, True),
+    Import('CodeMirrorLint', '@codemirror/lint', True, True),
+    Import('CodeMirrorSearch', '@codemirror/search', True, True),
+    Import('CodeMirrorState', '@codemirror/state', True, True),
+    Import('CodeMirrorView', '@codemirror/view', True, True),
 ]
 
 languages = {
-    'cpp': [Import('CodeMirrorLangCpp', '@codemirror/lang-cpp', True)],
-    'css': [Import('CodeMirrorLangCss', '@codemirror/lang-css', True)],
-    'html': [Import('CodeMirrorLangHtml', '@codemirror/lang-html', True)],
-    'java': [Import('CodeMirrorLangJava', '@codemirror/lang-java', True)],
+    'cpp': [Import('CodeMirrorLangCpp', '@codemirror/lang-cpp', True, True)],
+    'css': [Import('CodeMirrorLangCss', '@codemirror/lang-css', True, True)],
+    'html': [Import('CodeMirrorLangHtml', '@codemirror/lang-html', True, True)],
+    'java': [Import('CodeMirrorLangJava', '@codemirror/lang-java', True, True)],
     'javascript': [
-        Import('CodeMirrorLangJavascript', '@codemirror/lang-javascript', True)
+        Import('CodeMirrorLangJavascript', '@codemirror/lang-javascript', True, True)
     ],
-    'json': [Import('CodeMirrorLangJson', '@codemirror/lang-json', True)],
+    'json': [Import('CodeMirrorLangJson', '@codemirror/lang-json', True, True)],
     'markdown': [
-        Import('CodeMirrorLangMarkdown', '@codemirror/lang-markdown', True)
+        Import('CodeMirrorLangMarkdown', '@codemirror/lang-markdown', True, True)
     ],
-    'php': [Import('CodeMirrorLangPhp', '@codemirror/lang-php', True)],
+    'php': [Import('CodeMirrorLangPhp', '@codemirror/lang-php', True, True)],
     'python': [
-        Import('CodeMirrorLangPython', '@codemirror/lang-python', True)
+        Import('CodeMirrorLangPython', '@codemirror/lang-python', True, True)
     ],
-    'rust': [Import('CodeMirrorLangRust', '@codemirror/lang-rust', True)],
-    'sql': [Import('CodeMirrorLangSql', '@codemirror/lang-sql', True)],
-    'xml': [Import('CodeMirrorLangXml', '@codemirror/lang-xml', True)],
+    'rust': [Import('CodeMirrorLangRust', '@codemirror/lang-rust', True, True)],
+    'sql': [Import('CodeMirrorLangSql', '@codemirror/lang-sql', True, True)],
+    'xml': [Import('CodeMirrorLangXml', '@codemirror/lang-xml', True, True)],
     # 'yaml': [
-    #     Import('StreamLanguage', '@codemirror/language', False),
-    #     Import('yaml', '@codemirror/legacy-modes/mode/yaml', False),
+    #     Import('StreamLanguage', '@codemirror/language', False, False),
+    #     Import('yaml', '@codemirror/legacy-modes/mode/yaml', False, False),
     # ],
 }
 
 variants = {
     'yjs': [
-        Import('Y', 'yjs', True),
-        Import('WebrtcProvider', 'y-webrtc', False),
-        Import('yCollab', 'y-codemirror.next', False),
+        Import('Y', 'yjs', True, False),
+        Import('WebrtcProvider', 'y-webrtc', False, False),
+        Import('yCollab', 'y-codemirror.next', False, False),
     ],
 }
 
@@ -114,37 +115,39 @@ def main():
     import_lines = []
     cm6_lines = []
 
-    def add(name, path, star):
+    def add(name, path, star, splat):
         if star:
             import_line = f'import * as {name} from "{path}"'
-            cm6_line = f'    ...{name}'
         else:
             import_line = f'import {{ {name} }} from "{path}"'
-            cm6_line = f'    {name}'
         import_lines.append(import_line)
+        if splat:
+            cm6_line = f'    ...{name}'
+        else:
+            cm6_line = f'    {name}'
         cm6_lines.append(cm6_line)
 
-    for name, path, star in base:
-        add(name, path, star)
+    for name, path, star, splat in base:
+        add(name, path, star, splat)
 
     if args.language == 'all':
         name_parts.append('all')
         for language, imports in languages.items():
-            for name, path, star in imports:
-                add(name, path, star)
+            for name, path, star, splat in imports:
+                add(name, path, star, splat)
     elif args.language in languages:
         name_parts.append(args.language)
         imports = languages[args.language]
-        for name, path, star in imports:
-            add(name, path, star)
+        for name, path, star, splat in imports:
+            add(name, path, star, splat)
     else:
         assert args.language is None
 
     if args.variant in variants:
         name_parts.append(args.variant)
         imports = variants[args.variant]
-        for name, path, star in imports:
-            add(name, path, star)
+        for name, path, star, splat in imports:
+            add(name, path, star, splat)
     else:
         assert args.variant is None
 
