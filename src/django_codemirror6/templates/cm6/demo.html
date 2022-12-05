@@ -34,7 +34,9 @@ ON this.abc = that.def
          let options = matches.map(word => ({label: word, type: "text"}));
          let keywords = [...sql_keywords].map(word => ({label: word, type: "keyword"}));
          options.push(...keywords);
-         // TODO: Add all functions with "info" item.
+         // TODO: Add all SQL functions with "info" item.
+         // TODO: Add all SQL tables with "info" item.
+         // TODO: Add all SQL column names with "info" item.
          let examples = [
              {label: "hello", type: "variable", info: "(World)"},
              {label: "magic", type: "text", apply: "⠁⭒*.✩.*⭒⠁", detail: "macro"}
