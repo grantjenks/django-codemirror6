@@ -176,6 +176,7 @@ if __name__ == '__main__':
         ]
         others = [build + ['--variant', 'yjs'] for build in builds]
         commands = [*builds, *others]
+        commands.extend(cmd + ['--debug'] for cmd in commands[:])
         for command in tqdm.tqdm(commands):
             sys.argv = command
             main()
