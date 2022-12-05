@@ -71,6 +71,11 @@ ON this.abc = that.def
          return {dom}
      }
 
+     const indentPlainTextExtension = CM6.indentService.of((context, pos) => {
+         const previousLine = context.lineAt(pos, -1)
+         return previousLine.text.match(/^(\s)*/)[0].length
+     });
+
      let state = CM6.EditorState.create({
          doc: ytext.toString(),
          extensions: [
@@ -82,7 +87,9 @@ ON this.abc = that.def
              CM6.EditorView.lineWrapping,
              fixedHeightEditor,
              CM6.yCollab(ytext, provider.awareness, { undoManager }),
-             CM6.showPanel.of(statusPanel)
+             CM6.showPanel.of(statusPanel),
+             indentPlainTextExtension,
+             CM6.indentUnit.of("    ")
          ],
      })
 
