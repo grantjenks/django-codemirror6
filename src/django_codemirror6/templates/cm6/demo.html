@@ -20,17 +20,30 @@ ON this.abc = that.def
          ".cm-scroller": {overflow: "auto"}
      })
 
+     const sql_keywords = new Set("ALTER AND AS BETWEEN BY CASE CAST CONSTRAINT CREATE CROSS CUBE CURRENT_CATALOG CURRENT_DATE CURRENT_PATH CURRENT_ROLE CURRENT_SCHEMA CURRENT_TIME CURRENT_TIMESTAMP CURRENT_USER DEALLOCATE DELETE DESCRIBE DISTINCT DROP ELSE END ESCAPE EXCEPT EXECUTE EXISTS EXTRACT FALSE FOR FROM FULL GROUP GROUPING HAVING IN INNER INSERT INTERSECT INTO IS JOIN JSON_ARRAY JSON_EXISTS JSON_OBJECT JSON_QUERY JSON_VALUE LEFT LIKE LISTAGG LOCALTIME LOCALTIMESTAMP NATURAL NORMALIZE NOT NULL ON OR ORDER OUTER PREPARE RECURSIVE RIGHT ROLLUP SELECT SKIP TABLE THEN TRIM TRUE UESCAPE UNION UNNEST USING VALUES WHEN WHERE WITH".split(" "));
+
      function myCompletions(context) {
          let word = context.matchBefore(/\w*/)
          if (word.from == word.to && !context.explicit)
              return null
+         let content = context.state.doc.toString();
+         let all_matches = content.match(/\w+/g);
+         let set_matches = new Set(all_matches);
+         let value = content.slice(word.from, word.to);
+         let matches = [...set_matches].filter(x => !sql_keywords.has(x) && x != value);
+         let options = matches.map(word => ({label: word, type: "text"}));
+         let keywords = [...sql_keywords].map(word => ({label: word, type: "keyword"}));
+         options.push(...keywords);
+         // TODO: Add all functions with "info" item.
+         let examples = [
+             {label: "hello", type: "variable", info: "(World)"},
+             {label: "magic", type: "text", apply: "⠁⭒*.✩.*⭒⠁", detail: "macro"}
+         ];
+         options.push(...examples);
          return {
              from: word.from,
-             options: [
-                 {label: "match", type: "keyword"},
-                 {label: "hello", type: "variable", info: "(World)"},
-                 {label: "magic", type: "text", apply: "⠁⭒*.✩.*⭒⠁", detail: "macro"}
-             ]
+             options: options,
+             validFor: /^(\w+)$/
          }
      }
 
