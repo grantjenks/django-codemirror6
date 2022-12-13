@@ -3,7 +3,6 @@ from django.urls import reverse
 
 
 class TestCase(DjangoTestCase):
-
     def test_demo(self):
         client = Client()
         response = client.get(reverse('demo'))
