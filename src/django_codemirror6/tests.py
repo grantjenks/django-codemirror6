@@ -1,3 +1,10 @@
-from django.test import TestCase  # noqa: F401
+from django.test import Client, TestCase as DjangoTestCase
+from django.urls import reverse
 
-# Create your tests here.
+
+class TestCase(DjangoTestCase):
+
+    def test_demo(self):
+        client = Client()
+        response = client.get(reverse('demo'))
+        assert response.status_code == 200
