@@ -1,8 +1,6 @@
 Django CodeMirror 6
 ===================
 
-THIS PROJECT DOESN'T WORK. IT IS A FAILED EXPERIMENT.
-
 `Django CodeMirror 6 <http://www.grantjenks.com/docs/django-codemirror6/>`__ is
 an Apache2 licensed Django application to support CodeMirror 6.
 
@@ -13,6 +11,7 @@ Features
 - Pre-compiled bundles for Code Mirror 6
 - Tested on Python 3.7, 3.8, 3.9, 3.10
 - Tested on Django 3.2 LTS and Django 4.0
+- Tested on Linux, Mac, and Windows
 
 .. image:: https://github.com/grantjenks/django-codemirror6/workflows/integration/badge.svg
    :target: https://github.com/grantjenks/django-codemirror6/actions?query=workflow%3Aintegration
@@ -34,6 +33,39 @@ Change `settings.py` like:
 .. code::
 
    INSTALLED_APPS += ['django_codemirror6']
+
+In the template:
+
+.. code::
+
+   {% load static %}
+   ...
+   <script src="{% static 'cm6/cm6-all-yjs.min.js' %}"></script>
+
+Bundles are named as:
+
+.. code::
+
+   cm6[-language][-yjs][.min].js
+
+* ``[-language]`` is optional and any of cpp, css, html, java, javascript,
+json, markdown, php, python, rust, sql, xml, or the special "all"
+
+* ``[-yjs]`` is optional for real-time sharing/collaboration
+
+* ``[.min]`` is optional for minified sources
+
+Examples:
+
+* ``cm6.js`` is a text editor with no specific language support and no yjs
+
+* ``cm6-python.min.js`` is a minified text editor with Python language support
+
+* ``cm6-all-yjs.min.js`` is a minified text editor with everything
+
+See the `demo`_ for a Code Mirror 6 example configuration.
+
+.. _`demo`: https://github.com/grantjenks/django-codemirror6/blob/main/src/django_codemirror6/templates/cm6/demo.html
 
 
 Reference and Indices
