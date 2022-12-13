@@ -1,4 +1,5 @@
-from django.test import Client, TestCase as DjangoTestCase
+from django.test import Client
+from django.test import TestCase as DjangoTestCase
 from django.urls import reverse
 
 
