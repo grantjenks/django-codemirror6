@@ -49,7 +49,7 @@ Bundles are named as:
    cm6[-language][-yjs][.min].js
 
 * ``[-language]`` is optional and any of cpp, css, html, java, javascript,
-json, markdown, php, python, rust, sql, xml, or the special "all"
+  json, markdown, php, python, rust, sql, xml, or the special "all"
 
 * ``[-yjs]`` is optional for real-time sharing/collaboration
 
