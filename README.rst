@@ -9,8 +9,8 @@ Features
 --------
 
 - Pre-compiled bundles for Code Mirror 6
-- Tested on Python 3.7, 3.8, 3.9, 3.10
-- Tested on Django 3.2 LTS and Django 4.0
+- Tested on Python 3.7, 3.8, 3.9, 3.10, 3.11
+- Tested on Django 3.2 LTS and Django 4.1
 - Tested on Linux, Mac, and Windows
 
 .. image:: https://github.com/grantjenks/django-codemirror6/workflows/integration/badge.svg
